@@ -2,6 +2,28 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from dispositivos.views import inicio, dashboard
+
+from django.views.generic import TemplateView
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('dispositivos/', inicio, name="listar_dispositivos"),
+    # …… los otros path
+
+    path("", dashboard, name="dashboard"),
+    path("", include("accounts.urls")),  # login, logout
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")  # ← carga el .env
 
@@ -73,8 +95,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widgets_tweaks',
     'dispositivos',
+    'accounts',
+    'organizations',
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' 
+
+LOGIN_URL = "login"
+
+# A dónde redirigir después de un login exitoso (si no viene ?next=…)
+LOGIN_REDIRECT_URL = "dashboard"   # cámbialo por la ruta que tengas
+LOGOUT_REDIRECT_URL = "login"      # opcional: a dónde ir tras logout
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
